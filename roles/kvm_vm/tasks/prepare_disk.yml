@@ -13,13 +13,10 @@
       -F qcow2
       -b {{ vm_template_dir }}/{{ vm_image_name }}
       {{ vm_disk_path }}
-      {{ vm_disk_size }}
   when: not vm_disk.stat.exists
   changed_when: true
 
-- name: Set ownership of VM disk
+- name: Set permissions of VM disk
   ansible.builtin.file:
     path: "{{ vm_disk_path }}"
-    owner: qemu
-    group: qemu
     mode: '0600'
