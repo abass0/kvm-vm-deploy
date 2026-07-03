@@ -1,0 +1,17 @@
+---
+# tasks file for kvm_vm
+
+- name: Include variable validation tasks
+  ansible.builtin.include_tasks: validate.yml
+
+- name: Include disk preparation tasks
+  ansible.builtin.include_tasks: prepare_disk.yml
+
+- name: Include cloud-init configuration tasks
+  ansible.builtin.include_tasks: cloud_init.yml
+
+- name: Include VM definition tasks
+  ansible.builtin.include_tasks: define_vm.yml
+
+- name: Include VM startup tasks
+  ansible.builtin.include_tasks: start_vm.yml

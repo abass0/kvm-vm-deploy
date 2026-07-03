@@ -1,0 +1,24 @@
+---
+# VM startup tasks
+
+- name: Get current VM state
+  ansible.builtin.command:
+    cmd: virsh domstate {{ vm_name }}
+  register: vm_state
+  changed_when: false
+  failed_when: false
+
+- name: Start VM
+  ansible.builtin.command:
+    cmd: virsh start {{ vm_name }}
+  when: vm_state.stdout != "running"
+  changed_when: true
+
+- name: Wait for VM to be running
+  ansible.builtin.command:
+    cmd: virsh domstate {{ vm_name }}
+  register: vm_running_state
+  until: vm_running_state.stdout == "running"
+  retries: 10
+  delay: 2
+  changed_when: false

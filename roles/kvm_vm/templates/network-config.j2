@@ -1,0 +1,11 @@
+version: 2
+ethernets:
+  eth0:
+    addresses:
+      - {{ vm_ip }}/{{ vm_prefix }}
+    gateway4: {{ vm_gateway }}
+    nameservers:
+      addresses:
+{% for dns in vm_dns_servers %}
+        - {{ dns }}
+{% endfor %}

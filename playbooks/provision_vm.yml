@@ -1,0 +1,22 @@
+---
+# Example playbook for provisioning a VM using the kvm_vm role
+# This can be used as a Job Template in Automation Controller
+
+- name: Provision RHEL 9 virtual machine
+  hosts: hypervisors
+  become: true
+
+  roles:
+    - role: kvm_vm
+      vars:
+        vm_name: "{{ vm_name }}"
+        vm_hostname: "{{ vm_hostname | default(vm_name) }}"
+        vm_memory_mb: "{{ vm_memory_mb | default(2048) }}"
+        vm_vcpus: "{{ vm_vcpus | default(2) }}"
+        vm_disk_size: "{{ vm_disk_size | default('20G') }}"
+        use_dhcp: "{{ use_dhcp | default(true) }}"
+        vm_ip: "{{ vm_ip | default('') }}"
+        vm_prefix: "{{ vm_prefix | default(24) }}"
+        vm_gateway: "{{ vm_gateway | default('') }}"
+        vm_ssh_public_key: "{{ vm_ssh_public_key }}"
+        autostart: "{{ autostart | default(false) }}"

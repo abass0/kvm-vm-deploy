@@ -1,0 +1,27 @@
+---
+# Example host variables for kvm-host-01
+# Demonstrates provisioning multiple VMs
+
+vms_to_provision:
+  # DHCP example
+  - name: web-server-01
+    memory_mb: 4096
+    vcpus: 2
+    disk_size: 50G
+    use_dhcp: true
+    ssh_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDExampleKey..."
+
+  # Static IP example
+  - name: db-server-01
+    memory_mb: 8192
+    vcpus: 4
+    disk_size: 100G
+    use_dhcp: false
+    ip: 192.168.122.100
+    prefix: 24
+    gateway: 192.168.122.1
+    dns_servers:
+      - 192.168.122.1
+      - 8.8.8.8
+    ssh_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDExampleKey..."
+    autostart: true

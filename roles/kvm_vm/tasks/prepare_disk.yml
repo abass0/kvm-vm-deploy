@@ -1,0 +1,25 @@
+---
+# Disk preparation tasks
+
+- name: Check if VM disk already exists
+  ansible.builtin.stat:
+    path: "{{ vm_disk_path }}"
+  register: vm_disk
+
+- name: Create VM disk from golden image using backing file
+  ansible.builtin.command:
+    cmd: >
+      qemu-img create -f qcow2
+      -F qcow2
+      -b {{ vm_image }}
+      {{ vm_disk_path }}
+      {{ vm_disk_size }}
+  when: not vm_disk.stat.exists
+  changed_when: true
+
+- name: Set ownership of VM disk
+  ansible.builtin.file:
+    path: "{{ vm_disk_path }}"
+    owner: qemu
+    group: qemu
+    mode: '0600'

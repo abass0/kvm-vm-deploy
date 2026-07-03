@@ -1,0 +1,45 @@
+---
+# Variable validation tasks
+
+- name: Validate required variables are defined
+  ansible.builtin.assert:
+    that:
+      - vm_name is defined
+      - vm_name | length > 0
+      - vm_memory_mb is defined
+      - vm_memory_mb | int > 0
+      - vm_vcpus is defined
+      - vm_vcpus | int > 0
+      - vm_disk_size is defined
+      - vm_image is defined
+      - vm_hostname is defined
+      - vm_domain is defined
+      - vm_network is defined
+      - vm_user is defined
+      - vm_ssh_public_key is defined
+      - vm_ssh_public_key | length > 0
+    fail_msg: "Required variable is missing or invalid"
+    success_msg: "All required variables are defined"
+
+- name: Validate static network configuration
+  ansible.builtin.assert:
+    that:
+      - vm_ip is defined
+      - vm_ip | length > 0
+      - vm_prefix is defined
+      - vm_prefix | int > 0
+      - vm_gateway is defined
+      - vm_gateway | length > 0
+    fail_msg: "Static network configuration is incomplete"
+    success_msg: "Static network configuration is valid"
+  when: not use_dhcp
+
+- name: Check if golden image exists
+  ansible.builtin.stat:
+    path: "{{ vm_image }}"
+  register: golden_image
+
+- name: Fail if golden image does not exist
+  ansible.builtin.fail:
+    msg: "Golden image not found: {{ vm_image }}"
+  when: not golden_image.stat.exists

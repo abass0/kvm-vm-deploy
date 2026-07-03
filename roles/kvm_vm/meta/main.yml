@@ -1,0 +1,25 @@
+---
+galaxy_info:
+  role_name: kvm_vm
+  author: Red Hat Automation Platform Engineer
+  description: Provision RHEL 9 virtual machines from a golden QCOW2 image
+  company: Home Lab
+  license: MIT
+  min_ansible_version: "2.15"
+
+  platforms:
+    - name: Fedora
+      versions:
+        - all
+    - name: EL
+      versions:
+        - 9
+
+  galaxy_tags:
+    - virtualization
+    - kvm
+    - libvirt
+    - cloud-init
+    - rhel
+
+dependencies: []

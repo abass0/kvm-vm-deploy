@@ -1,0 +1,36 @@
+---
+# VM definition tasks
+
+- name: Check if VM is already defined
+  ansible.builtin.command:
+    cmd: virsh dominfo {{ vm_name }}
+  register: vm_defined
+  changed_when: false
+  failed_when: false
+
+- name: Generate libvirt domain XML
+  ansible.builtin.template:
+    src: vm.xml.j2
+    dest: "/tmp/{{ vm_name }}.xml"
+    mode: '0644'
+  when: vm_defined.rc != 0
+
+- name: Define VM in libvirt
+  ansible.builtin.command:
+    cmd: virsh define /tmp/{{ vm_name }}.xml
+  when: vm_defined.rc != 0
+  changed_when: true
+
+- name: Remove temporary XML file
+  ansible.builtin.file:
+    path: "/tmp/{{ vm_name }}.xml"
+    state: absent
+  when: vm_defined.rc != 0
+
+- name: Configure VM autostart
+  ansible.builtin.command:
+    cmd: virsh autostart {{ vm_name }}
+  when:
+    - autostart
+    - vm_defined.rc != 0
+  changed_when: true

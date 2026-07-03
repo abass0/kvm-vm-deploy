@@ -1,0 +1,72 @@
+---
+# Cloud-init configuration tasks
+
+- name: Create cloud-init configuration directory
+  ansible.builtin.file:
+    path: "{{ vm_cloud_init_dir }}"
+    state: directory
+    owner: qemu
+    group: qemu
+    mode: '0755'
+
+- name: Generate cloud-init user-data
+  ansible.builtin.template:
+    src: user-data.j2
+    dest: "{{ vm_cloud_init_dir }}/user-data"
+    owner: qemu
+    group: qemu
+    mode: '0644'
+
+- name: Generate cloud-init meta-data
+  ansible.builtin.template:
+    src: meta-data.j2
+    dest: "{{ vm_cloud_init_dir }}/meta-data"
+    owner: qemu
+    group: qemu
+    mode: '0644'
+
+- name: Generate cloud-init network-config for static IP
+  ansible.builtin.template:
+    src: network-config.j2
+    dest: "{{ vm_cloud_init_dir }}/network-config"
+    owner: qemu
+    group: qemu
+    mode: '0644'
+  when: not use_dhcp
+
+- name: Check if cloud-init ISO already exists
+  ansible.builtin.stat:
+    path: "{{ vm_cloud_init_iso }}"
+  register: cloud_init_iso
+
+- name: Generate cloud-init ISO with DHCP
+  ansible.builtin.command:
+    cmd: >
+      cloud-localds
+      {{ vm_cloud_init_iso }}
+      {{ vm_cloud_init_dir }}/user-data
+      {{ vm_cloud_init_dir }}/meta-data
+  when:
+    - use_dhcp
+    - not cloud_init_iso.stat.exists or cloud_init_iso.stat.mtime < ansible_date_time.epoch | int - 300
+  changed_when: true
+
+- name: Generate cloud-init ISO with static network
+  ansible.builtin.command:
+    cmd: >
+      cloud-localds
+      {{ vm_cloud_init_iso }}
+      {{ vm_cloud_init_dir }}/user-data
+      {{ vm_cloud_init_dir }}/meta-data
+      --network-config={{ vm_cloud_init_dir }}/network-config
+  when:
+    - not use_dhcp
+    - not cloud_init_iso.stat.exists or cloud_init_iso.stat.mtime < ansible_date_time.epoch | int - 300
+  changed_when: true
+
+- name: Set ownership of cloud-init ISO
+  ansible.builtin.file:
+    path: "{{ vm_cloud_init_iso }}"
+    owner: qemu
+    group: qemu
+    mode: '0644'
