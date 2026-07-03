@@ -12,7 +12,8 @@ vm_vcpus: 2
 vm_disk_size: 20G
 
 # Source image
-vm_image: /var/lib/libvirt/images/templates/rhel9-golden.qcow2
+vm_template_dir: /var/lib/libvirt/images/templates
+vm_image_name: rhel9-golden.qcow2
 
 # Network configuration
 vm_network: default

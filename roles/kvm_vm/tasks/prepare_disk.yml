@@ -11,7 +11,7 @@
     cmd: >
       qemu-img create -f qcow2
       -F qcow2
-      -b {{ vm_image }}
+      -b {{ vm_template_dir }}/{{ vm_image_name }}
       {{ vm_disk_path }}
       {{ vm_disk_size }}
   when: not vm_disk.stat.exists

@@ -34,11 +34,6 @@
     mode: '0644'
   when: not use_dhcp
 
-- name: Check if cloud-init ISO already exists
-  ansible.builtin.stat:
-    path: "{{ vm_cloud_init_iso }}"
-  register: cloud_init_iso
-
 - name: Generate cloud-init ISO with DHCP
   ansible.builtin.command:
     cmd: >
@@ -46,9 +41,7 @@
       {{ vm_cloud_init_iso }}
       {{ vm_cloud_init_dir }}/user-data
       {{ vm_cloud_init_dir }}/meta-data
-  when:
-    - use_dhcp
-    - not cloud_init_iso.stat.exists or cloud_init_iso.stat.mtime < ansible_date_time.epoch | int - 300
+  when: use_dhcp
   changed_when: true
 
 - name: Generate cloud-init ISO with static network
@@ -59,9 +52,7 @@
       {{ vm_cloud_init_dir }}/user-data
       {{ vm_cloud_init_dir }}/meta-data
       --network-config={{ vm_cloud_init_dir }}/network-config
-  when:
-    - not use_dhcp
-    - not cloud_init_iso.stat.exists or cloud_init_iso.stat.mtime < ansible_date_time.epoch | int - 300
+  when: not use_dhcp
   changed_when: true
 
 - name: Set ownership of cloud-init ISO

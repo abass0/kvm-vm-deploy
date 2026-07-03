@@ -11,7 +11,8 @@
       - vm_vcpus is defined
       - vm_vcpus | int > 0
       - vm_disk_size is defined
-      - vm_image is defined
+      - vm_template_dir is defined
+      - vm_image_name is defined
       - vm_hostname is defined
       - vm_domain is defined
       - vm_network is defined
@@ -36,10 +37,10 @@
 
 - name: Check if golden image exists
   ansible.builtin.stat:
-    path: "{{ vm_image }}"
+    path: "{{ vm_template_dir }}/{{ vm_image_name }}"
   register: golden_image
 
 - name: Fail if golden image does not exist
   ansible.builtin.fail:
-    msg: "Golden image not found: {{ vm_image }}"
+    msg: "Golden image not found: {{ vm_template_dir }}/{{ vm_image_name }}"
   when: not golden_image.stat.exists

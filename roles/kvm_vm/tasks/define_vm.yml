@@ -8,29 +8,29 @@
   changed_when: false
   failed_when: false
 
+- name: Fail if VM already exists
+  ansible.builtin.fail:
+    msg: "Virtual machine '{{ vm_name }}' already exists."
+  when: vm_defined.rc == 0
+
 - name: Generate libvirt domain XML
   ansible.builtin.template:
     src: vm.xml.j2
     dest: "/tmp/{{ vm_name }}.xml"
     mode: '0644'
-  when: vm_defined.rc != 0
 
 - name: Define VM in libvirt
   ansible.builtin.command:
     cmd: virsh define /tmp/{{ vm_name }}.xml
-  when: vm_defined.rc != 0
   changed_when: true
 
 - name: Remove temporary XML file
   ansible.builtin.file:
     path: "/tmp/{{ vm_name }}.xml"
     state: absent
-  when: vm_defined.rc != 0
 
 - name: Configure VM autostart
   ansible.builtin.command:
     cmd: virsh autostart {{ vm_name }}
-  when:
-    - autostart
-    - vm_defined.rc != 0
+  when: autostart
   changed_when: true
